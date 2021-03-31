@@ -2,7 +2,7 @@
 
 pkgbase=python-pytest
 pkgname=('python-pytest')
-pkgver=5.4.3
+pkgver=6.2.1
 pkgrel=1
 provides=("python3-pytest")
 replaces=("python3-pytest")
@@ -18,15 +18,13 @@ depends=('python'
          'python-pluggy'
          'python-py'
          'python-setuptools'
+         'python-packaging'
+         'python-iniconfig'
+         'python-toml'
          'python-six')
 makedepends=('python-setuptools-scm')
 source=("pytest-${pkgver}.tar.gz::https://github.com/pytest-dev/pytest/archive/${pkgver}.tar.gz")
-sha512sums=('285ae5ce2b503acd15c97ae015fb7bb2fda5507e17c7c8e5b0b52526f939c818e3c8b1788290c11388cabdbb550bef4328cf3a57b4a60b42341a0470c335078f')
-
-prepare() {
-  sed -i "s/'_pytest.vendored_packages'//" pytest-${pkgver}/setup.py
-  sed -i 's/assert numentries == 0/assert numentries == 26/' pytest-${pkgver}/testing/python/collect.py
-}
+sha256sums=('efc60ff9d50f63a6cc1571f5f121155cd1775905a29dbc58b55612ac5a81f530')
 
 build() {
   export SETUPTOOLS_SCM_PRETEND_VERSION=${pkgver}

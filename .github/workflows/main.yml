@@ -7,13 +7,11 @@ on:
 jobs:
   build:
     runs-on: windows-latest
-    defaults:
-      run:
-        shell: msys2 {0}
 
     steps:
       - uses: actions/checkout@v2
         with:
+          path: temp
           fetch-depth: 0
 
       - uses: msys2/setup-msys2@v2
@@ -22,17 +20,34 @@ jobs:
           install: git base-devel msys2-devel
           update: true
 
+      - name: Add staging repo
+        shell: msys2 {0}
+        run: |
+          sed -i '1s|^|[staging]\nServer = https://repo.msys2.org/staging/\nSigLevel = Never\n|' /etc/pacman.conf
+
+      - name: Update using staging
+        run: |
+          msys2 -c 'pacman --noconfirm -Suuy'
+          msys2 -c 'pacman --noconfirm -Suu'
+
+      - name: Move Checkout
+        run: |
+          Copy-Item -Path ".\temp" -Destination "C:\_" -Recurse
+
       - name: CI-Build
-        run: ./ci-build.sh
+        shell: msys2 {0}
+        run: |
+          cd /C/_
+          ./.ci/ci-build.sh
 
       - name: "Upload binaries"
         uses: actions/upload-artifact@v2
         with:
           name: msys2-packages
-          path: artifacts/*.pkg.tar.*
+          path: C:/_/artifacts/*.pkg.tar.*
 
       - name: "Upload sources"
         uses: actions/upload-artifact@v2
         with:
           name: sources
-          path: artifacts/*.src.tar.*
+          path: C:/_/artifacts/*.src.tar.*
